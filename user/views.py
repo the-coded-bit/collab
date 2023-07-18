@@ -71,7 +71,7 @@ def logout(request):
 # get all users
 @ensure_valid_jwt
 def get_users(request):
-    users = User.objects.all().values('username', 'email')
+    users = User.objects.all().values('username', 'email', 'id')
     users_list = list(users)
     return JsonResponse(users_list, safe=False)
 

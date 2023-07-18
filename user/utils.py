@@ -23,20 +23,15 @@ def ensure_valid_jwt(view):
     def wrapper(request ,*args, **kwargs):
             try:
                 token = request.get_signed_cookie('access-token', salt = settings.SECRET_KEY)
-                user_id = request.GET['id']
-                print('user id', user_id)
                 if token:
                     try:
-                        # print(args[0])
                         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-                        # print(payload['id'], payload['id'] == int(user_id))
-                        if payload['id'] != int(user_id):
-                            return err_response('invalid user')
                     except jwt.ExpiredSignatureError:
                         return err_response('JWT has expired')
                     except jwt.InvalidTokenError:
                         return err_response('Invalid JWT')
                     return view(request, *args, **kwargs )
             except Exception as err:
+                print(err)
                 return err_response('token does not exist')
     return wrapper
