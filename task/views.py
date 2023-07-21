@@ -80,7 +80,11 @@ def notify_completed_tasks(request):
          payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
          user = User.objects.get(id = payload['id'])
          assigned_tasks = Task.objects.filter(assignee = user, notify_status = True)
-         tasks_list = [model_to_dict(task) for task in assigned_tasks]
+         tasks_list = [{'task_des': task.task_des, 'assigned_to': User.get_username(task.assigned_to)} for task in assigned_tasks]
+         # Update the 'notify_status' of tasks to False
+         for task in assigned_tasks:
+            task.notify_status = False
+            task.save()
          return JsonResponse({'response': tasks_list, 'count': tasks_list.__len__()}, safe=False)
     else:
         return err_response('invalid request')
